@@ -5,6 +5,7 @@ import Web3 from 'web3'
 import DaiToken from '../abis/DaiToken.json'
 import DappToken from '../abis/DappToken.json'
 import TokenFarm from '../abis/TokenFarm.json'
+import Main from './Main'
 
 class App extends Component {
 
@@ -28,9 +29,9 @@ class App extends Component {
     if (daiTokenData) {
       const daiToken = new web3.eth.Contract(DaiToken.abi, daiTokenData.address)
       this.setState({ daiToken })
-      let daiTokenBalance = daiToken.methods.balanceOf(this.state.account).call()
+      let daiTokenBalance = await daiToken.methods.balanceOf(this.state.account).call()
       this.setState({ daiTokenBalance: daiTokenBalance.toString() })
-      console.log(await daiTokenBalance)
+      // console.log(await daiTokenBalance)
     } else {
       window.alert("DaiToken contract not deployed to the connected network")
     }
@@ -39,9 +40,9 @@ class App extends Component {
     if (dappTokenData) {
       const dappToken = new web3.eth.Contract(DappToken.abi, dappTokenData.address)
       this.setState({ dappToken })
-      let dappTokenBalance = dappToken.methods.balanceOf(this.state.account).call()
+      let dappTokenBalance = await dappToken.methods.balanceOf(this.state.account).call()
       this.setState({ dappTokenBalance: dappTokenBalance.toString() })
-      console.log(await dappTokenBalance)
+      // console.log(await dappTokenBalance)
     } else {
       window.alert("DappToken contract not deployed to the connected network")
     }
@@ -50,9 +51,9 @@ class App extends Component {
     if (tokenFarmData) {
       const tokenFarm = new web3.eth.Contract(TokenFarm.abi, tokenFarmData.address)
       this.setState({ tokenFarm })
-      let stakingBalance = tokenFarm.methods.stakingBalance(this.state.account).call()
+      let stakingBalance = await tokenFarm.methods.stakingBalance(this.state.account).call()
       this.setState({ stakingBalance: stakingBalance.toString() })
-      console.log(await stakingBalance)
+      // console.log(await stakingBalance)
     } else {
       window.alert("tokenFarm contract not deployed to the connected network")
     }
@@ -78,14 +79,25 @@ class App extends Component {
       daiToken: {},
       dappToken: {},
       tokenFarm: {},
-      daiTokenBalance: 0,
-      dappTokenBalance: 0,
-      stakingBalance: 0,
+      daiTokenBalance: '0',
+      dappTokenBalance: '0',
+      stakingBalance: '0',
       loading: true
     }
   }
 
   render() {
+    let content
+     if (this.state.loading) {
+      content = <p id="loader" className="text-center">Loading...</p>
+    } else {
+      content = <Main
+        daiTokenBalance={this.state.daiTokenBalance}
+        dappTokenBalance={this.state.dappTokenBalance}
+        stakingBalance={this.state.stakingBalance}
+      />
+    }
+
     return (
       <div>
         <Navbar account={this.state.account} />
@@ -100,7 +112,7 @@ class App extends Component {
                 >
                 </a>
 
-                <h1>Hello, World!</h1>
+                {content}
 
               </div>
             </main>
